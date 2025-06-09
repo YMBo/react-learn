@@ -50,6 +50,7 @@ import {
   markContainerAsRoot,
   unmarkContainerAsRoot,
 } from './ReactDOMComponentTree';
+/** 🚀 引入的时候通过registerEvents()往allNativeEvents注册了事件 */
 import {listenToAllSupportedEvents} from '../events/DOMPluginEventSystem';
 import {
   ELEMENT_NODE,
@@ -86,12 +87,17 @@ const defaultOnRecoverableError =
       };
 
 function ReactDOMRoot(internalRoot: FiberRoot) {
+  /**
+   * _internalRoot 保存的是FiberRootNode跟节点
+   */
   this._internalRoot = internalRoot;
 }
 
+/** 🚀 render方法 */
 ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render = function(
   children: ReactNodeList,
 ): void {
+  // 🚀 拿到根节点的FiberRootNode
   const root = this._internalRoot;
   if (root === null) {
     throw new Error('Cannot update an unmounted root.');
@@ -115,8 +121,11 @@ ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render = functio
       );
     }
 
+    /** 🚀 containerInfo保存的是ReactDOM.createRoot传入的DOM节点*/
     const container = root.containerInfo;
 
+    /** 🚀 如果不是注释节点 */
+    /** 🚀 这部分是找到root.current下的第一个组件对应的dom节点 */
     if (container.nodeType !== COMMENT_NODE) {
       const hostInstance = findHostInstanceWithNoPortals(root.current);
       if (hostInstance) {
@@ -131,6 +140,7 @@ ReactDOMHydrationRoot.prototype.render = ReactDOMRoot.prototype.render = functio
       }
     }
   }
+  //
   updateContainer(children, root, null, null);
 };
 
@@ -167,10 +177,11 @@ export function createRoot(
   container: Element | Document | DocumentFragment,
   options?: CreateRootOptions,
 ): RootType {
+  /** 🚀 校验容器节点 */
   if (!isValidContainer(container)) {
     throw new Error('createRoot(...): Target container is not a DOM element.');
   }
-
+  // 🚀 在dev环境下 1、如果DOM容器是body则提示error 2、如果已经render过了则提示error
   warnIfReactDOMContainerInDEV(container);
 
   let isStrictMode = false;
@@ -201,6 +212,7 @@ export function createRoot(
         }
       }
     }
+    // 🚀 开启严格模式
     if (options.unstable_strictMode === true) {
       isStrictMode = true;
     }
@@ -210,9 +222,11 @@ export function createRoot(
     ) {
       concurrentUpdatesByDefaultOverride = true;
     }
+    // 🚀 React.useId生成id的前缀
     if (options.identifierPrefix !== undefined) {
       identifierPrefix = options.identifierPrefix;
     }
+    // 🚀  当 React 自动从错误中恢复时调用的可选回调
     if (options.onRecoverableError !== undefined) {
       onRecoverableError = options.onRecoverableError;
     }
@@ -221,6 +235,7 @@ export function createRoot(
     }
   }
 
+  /** 🚀 创建根fiber节点 */
   const root = createContainer(
     container,
     ConcurrentRoot,
@@ -231,12 +246,16 @@ export function createRoot(
     onRecoverableError,
     transitionCallbacks,
   );
+
+  // 🚀 给DOM容器做标记为根节点hostRoot
   markContainerAsRoot(root.current, container);
 
+  /** 🚀 获取DOM节点，如果是comment节点则取父级元素 */
   const rootContainerElement: Document | Element | DocumentFragment =
     container.nodeType === COMMENT_NODE
       ? (container.parentNode: any)
       : container;
+  /** 🚀 注册事件 */
   listenToAllSupportedEvents(rootContainerElement);
 
   return new ReactDOMRoot(root);
@@ -330,11 +349,17 @@ export function hydrateRoot(
 export function isValidContainer(node: any): boolean {
   return !!(
     node &&
+    /** 🚀 元素节点 */
     (node.nodeType === ELEMENT_NODE ||
+      /** 🚀 文档节点 */
       node.nodeType === DOCUMENT_NODE ||
+      /** 🚀 虚拟节点（createDocumentFragment，插入后不会产生元素节点） */
       node.nodeType === DOCUMENT_FRAGMENT_NODE ||
+      /** 🚀  是否允许注释节点作为react DOM的容器，这里禁用 true */
       (!disableCommentsAsDOMContainers &&
+        /** 🚀 校验节点类型 == 8 */
         node.nodeType === COMMENT_NODE &&
+        /** 🚀 节点值必须是 ' react-mount-point-unstable '*/
         (node: any).nodeValue === ' react-mount-point-unstable '))
   );
 }
@@ -352,6 +377,11 @@ export function isValidContainerLegacy(node: any): boolean {
   );
 }
 
+/**
+ * 🚀 在dev环境下
+ * 1、如果DOM容器是body则提示error
+ * 2、如果已经render过了则提示error
+ */
 function warnIfReactDOMContainerInDEV(container: any) {
   if (__DEV__) {
     if (

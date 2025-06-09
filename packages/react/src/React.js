@@ -71,7 +71,7 @@ import {act} from './ReactAct';
 const createElement = __DEV__ ? createElementWithValidation : createElementProd;
 const cloneElement = __DEV__ ? cloneElementWithValidation : cloneElementProd;
 const createFactory = __DEV__ ? createFactoryWithValidation : createFactoryProd;
-
+console.log('aaa', __DEV__);
 const Children = {
   map,
   forEach,

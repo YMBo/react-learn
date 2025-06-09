@@ -129,6 +129,25 @@ function FiberRootNode(
   }
 }
 
+/**
+ * 🚀创建FiberRootNode节点
+ *
+ * 🚀创建FiberNode
+ *
+ * 🚀当前应用的FiberNode挂在到FiberRootNode实例的currents属性上
+ *
+ * @param {DOM} containerInfo 挂载的根元素root
+ * @param {RootTag} tag 当前节点类型，根节点是1
+ * @param {*} hydrate
+ * @param {*} initialChildren
+ * @param {*} hydrationCallbacks
+ * @param {*} isStrictMode 严格模式
+ * @param {*} concurrentUpdatesByDefaultOverride
+ * @param {*} identifierPrefix 用于useId 的前缀
+ * @param {Function} onRecoverableError 当React从错误中自动恢复时的回调
+ * @param {*} transitionCallbacks
+ * @returns
+ */
 export function createFiberRoot(
   containerInfo: any,
   tag: RootTag,
@@ -145,6 +164,7 @@ export function createFiberRoot(
   onRecoverableError: null | ((error: mixed) => void),
   transitionCallbacks: null | TransitionTracingCallbacks,
 ): FiberRoot {
+  // 🚀 整个应用的根节点 FiberRootNode
   const root: FiberRoot = (new FiberRootNode(
     containerInfo,
     tag,
@@ -152,24 +172,30 @@ export function createFiberRoot(
     identifierPrefix,
     onRecoverableError,
   ): any);
+  // 🚀 写死了 不会走进来
   if (enableSuspenseCallback) {
     root.hydrationCallbacks = hydrationCallbacks;
   }
-
+  // 🚀 写死了 不会走进来
   if (enableTransitionTracing) {
     root.transitionCallbacks = transitionCallbacks;
   }
 
   // Cyclic construction. This cheats the type system right now because
   // stateNode is any.
+  // 🚀 创建rootFiber。
+  // 🚀 rootFiber 和 FiberRootNode区别：FiberRootNode是整个应用的根节点，rootFiber是<App/>所在组件的根节点
+  // 🚀 多次调用ReactDOM.render渲染不同的组件树，他们会拥有不同的rootFiber。但整个应用的根节点只有一个就是fiberRootNode
   const uninitializedFiber = createHostRootFiber(
     tag,
     isStrictMode,
     concurrentUpdatesByDefaultOverride,
   );
+  // 🚀 fiberRootNode的current会指向当前页面上已渲染内容对应Fiber树，即current Fiber树
   root.current = uninitializedFiber;
   uninitializedFiber.stateNode = root;
 
+  // 🚀 只有调用build-for-devtools时enableCache才为true
   if (enableCache) {
     const initialCache = createCache();
     retainCache(initialCache);
@@ -202,6 +228,8 @@ export function createFiberRoot(
     uninitializedFiber.memoizedState = initialState;
   }
 
+  // 🚀 初始化渲染队列
+  // 后面的updateContainer 就是根据这个UpdateQueue属性来更新的
   initializeUpdateQueue(uninitializedFiber);
 
   return root;

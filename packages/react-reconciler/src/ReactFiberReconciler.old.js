@@ -244,6 +244,21 @@ function findHostInstanceWithWarning(
   return findHostInstance(component);
 }
 
+/**
+ * 🚀 创建FiberRootNode 实例 A
+ * 🚀 创建FiberNode 实例 B
+ * 🚀 A.current=B current指的是当前页面渲染节点
+ * 🚀 初始化B的memoizedState、updateQueue属性
+ * @param {*} containerInfo
+ * @param {*} tag
+ * @param {*} hydrationCallbacks
+ * @param {*} isStrictMode
+ * @param {*} concurrentUpdatesByDefaultOverride
+ * @param {*} identifierPrefix
+ * @param {*} onRecoverableError
+ * @param {*} transitionCallbacks
+ * @returns
+ */
 export function createContainer(
   containerInfo: Container,
   tag: RootTag,
@@ -256,6 +271,7 @@ export function createContainer(
 ): OpaqueRoot {
   const hydrate = false;
   const initialChildren = null;
+  /** 🚀 创建fiber节点 */
   return createFiberRoot(
     containerInfo,
     tag,
@@ -327,14 +343,18 @@ export function updateContainer(
   if (__DEV__) {
     onScheduleRoot(container, element);
   }
+  /** 🚀 当前项目根FiberNode */
   const current = container.current;
+  /** 🚀 返回从react初始化到现在的时间戳 */
   const eventTime = requestEventTime();
+  /** 🚀 申请车道 */
   const lane = requestUpdateLane(current);
 
   if (enableSchedulingProfiler) {
     markRenderScheduled(lane);
   }
 
+  /** 🚀 获取当前parentComponent的上下文 */
   const context = getContextForSubtree(parentComponent);
   if (container.context === null) {
     container.context = context;
@@ -378,6 +398,7 @@ export function updateContainer(
     update.callback = callback;
   }
 
+  /** 🚀 根据updateQueue,渲染fiber */
   const root = enqueueUpdate(current, update, lane);
   if (root !== null) {
     scheduleUpdateOnFiber(root, current, lane, eventTime);
@@ -515,6 +536,11 @@ export {findHostInstance};
 
 export {findHostInstanceWithWarning};
 
+/**
+ * 🚀
+ * @param {FiberNode} fiber 这个fiber是FiberNode的实例，createFiber创建的
+ * @returns hostFiber对应的真实DOM节点
+ */
 export function findHostInstanceWithNoPortals(
   fiber: Fiber,
 ): PublicInstance | null {

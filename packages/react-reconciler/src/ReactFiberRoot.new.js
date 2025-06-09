@@ -57,6 +57,7 @@ function FiberRootNode(
   onRecoverableError,
 ) {
   this.tag = tag;
+  /** 🚀 容器元素 Element | Document | DocumentFragment */
   this.containerInfo = containerInfo;
   this.pendingChildren = null;
   this.current = null;
@@ -66,6 +67,7 @@ function FiberRootNode(
   this.context = null;
   this.pendingContext = null;
   this.callbackNode = null;
+  /**调度优先级，涉及到Lane */
   this.callbackPriority = NoLane;
   this.eventTimes = createLaneMap(NoLanes);
   this.expirationTimes = createLaneMap(NoTimestamp);
@@ -154,6 +156,8 @@ export function createFiberRoot(
     identifierPrefix,
     onRecoverableError,
   ): any);
+  // eslint-disable-next-line react-internal/no-production-logging
+  console.log('🌲 创建根root =>', root);
   if (enableSuspenseCallback) {
     root.hydrationCallbacks = hydrationCallbacks;
   }

@@ -165,6 +165,10 @@ if (__DEV__) {
   };
 }
 
+/**
+ * 🚀 给createHostRootFiber创建出来的FiberNode实例挂载updateQueue属性
+ * @param {FiberNode} fiber
+ */
 export function initializeUpdateQueue<State>(fiber: Fiber): void {
   const queue: UpdateQueue<State> = {
     baseState: fiber.memoizedState,
@@ -199,6 +203,12 @@ export function cloneUpdateQueue<State>(
   }
 }
 
+/**
+ * 🚀 生成updata对象
+ * @param {*} eventTime
+ * @param {*} lane
+ * @returns
+ */
 export function createUpdate(eventTime: number, lane: Lane): Update<*> {
   const update: Update<*> = {
     eventTime,
@@ -213,6 +223,13 @@ export function createUpdate(eventTime: number, lane: Lane): Update<*> {
   return update;
 }
 
+/**
+ * 🚀
+ * @param {*} fiber
+ * @param {*} update
+ * @param {*} lane
+ * @returns
+ */
 export function enqueueUpdate<State>(
   fiber: Fiber,
   update: Update<State>,

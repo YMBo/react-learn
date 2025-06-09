@@ -168,6 +168,8 @@ export const deferRenderPhaseUpdateToNextBatch = false;
 
 // Disable support for comment nodes as React DOM containers. Already disabled
 // in open source, but www codebase still relies on it. Need to remove.
+
+/** 🚀 是否允许注释节点（就是html中的注释）作为react DOM的容器，这里禁用  */
 export const disableCommentsAsDOMContainers = true;
 
 // Disable javascript: URL strings in href for XSS protection.

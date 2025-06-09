@@ -30,17 +30,23 @@ import {clz32} from './clz32';
 // Lane values below should be kept in sync with getLabelForLane(), used by react-devtools-timeline.
 // If those values are changed that package should be rebuilt and redeployed.
 
+/** 🚀 所有车道 */
 export const TotalLanes = 31;
 
+/** 🚀 无可用车道 */
 export const NoLanes: Lanes = /*                        */ 0b0000000000000000000000000000000;
+/** 🚀 无可用车道 */
 export const NoLane: Lane = /*                          */ 0b0000000000000000000000000000000;
-
+/** 🚀 同步车道 */
 export const SyncLane: Lane = /*                        */ 0b0000000000000000000000000000001;
-
+/** 🚀 连续输入Hydration 车道  */
 export const InputContinuousHydrationLane: Lane = /*    */ 0b0000000000000000000000000000010;
+/** 🚀 连续输入车道 */
 export const InputContinuousLane: Lane = /*             */ 0b0000000000000000000000000000100;
 
+/** 🚀 默认Hydration车道 */
 export const DefaultHydrationLane: Lane = /*            */ 0b0000000000000000000000000001000;
+/** 🚀 默认车道 */
 export const DefaultLane: Lane = /*                     */ 0b0000000000000000000000000010000;
 
 const TransitionHydrationLane: Lane = /*                */ 0b0000000000000000000000000100000;
@@ -463,6 +469,12 @@ export function includesOnlyTransitions(lanes: Lanes) {
   return (lanes & TransitionLanes) === lanes;
 }
 
+/**
+ * 🚀 是否包括同步lanes
+ * @param {*} root
+ * @param {*} lanes
+ * @returns
+ */
 export function includesBlockingLane(root: FiberRoot, lanes: Lanes) {
   if (
     allowConcurrentByDefault &&
@@ -479,6 +491,12 @@ export function includesBlockingLane(root: FiberRoot, lanes: Lanes) {
   return (lanes & SyncDefaultLanes) !== NoLanes;
 }
 
+/**
+ * 是否包含过期lanes
+ * @param {*} root
+ * @param {*} lanes
+ * @returns
+ */
 export function includesExpiredLane(root: FiberRoot, lanes: Lanes) {
   // This is a separate check from includesBlockingLane because a lane can
   // expire after a render has already started.

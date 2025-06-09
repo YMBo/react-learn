@@ -71,6 +71,11 @@ import {
   logRenderStopped,
 } from './DebugTracing';
 
+/**
+ * 🚀 这个./ReactFiberHostConfig文件是空的
+ * 实在运行时环境填充的。
+ * 浏览器环境下用的是react-dom/src/client/ReactDOMHostConfig.js填充
+ */
 import {
   resetAfterCommit,
   scheduleTimeout,
@@ -251,6 +256,8 @@ import {processTransitionCallbacks} from './ReactFiberTracingMarkerComponent.old
 
 const ceil = Math.ceil;
 
+// 🚀 /react/packages/react/src/React.js
+// 🚀 /react/packages/react/src/ReactSharedInternals.js
 const {
   ReactCurrentDispatcher,
   ReactCurrentOwner,
@@ -275,6 +282,7 @@ const RootCompleted = 5;
 const RootDidNotComplete = 6;
 
 // Describes where we are in the React execution stack
+/**🚀 描述在执行栈中的位置 */
 let executionContext: ExecutionContext = NoContext;
 // The root we're working on
 let workInProgressRoot: FiberRoot | null = null;
@@ -425,9 +433,14 @@ export function getWorkInProgressRoot(): FiberRoot | null {
   return workInProgressRoot;
 }
 
+/**
+ * 🚀 获取从react初始化到当前调用的时间
+ */
 export function requestEventTime() {
+  // 🚀 如果当前执行栈是RenderContext或CommitContext阶段
   if ((executionContext & (RenderContext | CommitContext)) !== NoContext) {
     // We're inside React, so it's fine to read the actual time.
+    /** 🚀 获取从react初始化到当前调用的时间 */
     return now();
   }
   // We're not inside React, so we may be in the middle of a browser event.
@@ -436,6 +449,7 @@ export function requestEventTime() {
     return currentEventTime;
   }
   // This is the first update since React yielded. Compute a new start time.
+  // 🚀 react第一次渲染，给currentEventTime初始化一个时间
   currentEventTime = now();
   return currentEventTime;
 }
@@ -447,9 +461,12 @@ export function getCurrentTime() {
 export function requestUpdateLane(fiber: Fiber): Lane {
   // Special cases
   const mode = fiber.mode;
+  // 🚀 如果当前模式不是并发模式
   if ((mode & ConcurrentMode) === NoMode) {
+    // 🚀 返回同步车道
     return (SyncLane: Lane);
   } else if (
+    // 🚀 如果当前执行栈是RenderContext执行栈
     !deferRenderPhaseUpdateToNextBatch &&
     (executionContext & RenderContext) !== NoContext &&
     workInProgressRootRenderLanes !== NoLanes
@@ -669,6 +686,9 @@ export function scheduleInitialHydrationOnRoot(
   ensureRootIsScheduled(root, eventTime);
 }
 
+/**
+ * 🚀 检查这是否是渲染阶段更新。仅由类组件调用
+ */
 export function isUnsafeClassRenderPhaseUpdate(fiber: Fiber) {
   // Check if this is a render phase update. Only called by class components,
   // which special (deprecated) behavior for UNSAFE_componentWillReceive props.
@@ -1739,7 +1759,9 @@ function workLoopSync() {
 }
 
 function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
+  /** 🚀 上一个执行上下文 */
   const prevExecutionContext = executionContext;
+  /** 🚀 附加当前的执行上下文 */
   executionContext |= RenderContext;
   const prevDispatcher = pushDispatcher();
 
@@ -1764,6 +1786,7 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
 
     workInProgressTransitions = getTransitionsForLanes(root, lanes);
     resetRenderTimer();
+    // 🚀 这里给workInProgressRoot赋值了
     prepareFreshStack(root, lanes);
   }
 
@@ -1779,6 +1802,7 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
 
   do {
     try {
+      // 🚀 并发任务调度
       workLoopConcurrent();
       break;
     } catch (thrownValue) {
@@ -1819,7 +1843,12 @@ function renderRootConcurrent(root: FiberRoot, lanes: Lanes) {
 }
 
 /** @noinline */
+/**
+ * 🚀 并发任务调度
+ */
 function workLoopConcurrent() {
+  // 🚀 如果任务间隔大于5ms shouldYield返回true，否则false
+  // 🚀 shouldYield 判断是否应该把控制权交给浏览器主线程
   // Perform work until Scheduler asks us to yield
   while (workInProgress !== null && !shouldYield()) {
     performUnitOfWork(workInProgress);

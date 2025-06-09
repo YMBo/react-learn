@@ -41,6 +41,14 @@ import {
   startLoggingProfilingEvents,
 } from '../SchedulerProfiling';
 
+/**
+ * 🚀 获取从文档渲染到当前的时间长度
+ *
+ * https://developer.mozilla.org/zh-CN/docs/Web/API/DOMHighResTimeStamp
+ * performance时间相对来说精度高，表示从当前文档生命周期的开始节点的标准时间之后到当前调用时经过的时间
+ *
+ * Date 时间依赖于系统
+ */
 let getCurrentTime;
 const hasPerformanceNow =
   typeof performance === 'object' && typeof performance.now === 'function';
@@ -437,6 +445,10 @@ let startTime = -1;
 
 let needsPaint = false;
 
+/**
+ * 🚀 判断更新时间是否超过frameInterval
+ * @returns {boolean}
+ */
 function shouldYieldToHost() {
   const timeElapsed = getCurrentTime() - startTime;
   if (timeElapsed < frameInterval) {

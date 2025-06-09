@@ -83,11 +83,13 @@ export function createEventListenerWrapper(
   );
 }
 
+/** 🚀 创建优先级的listener ？ */
 export function createEventListenerWrapperWithPriority(
   targetContainer: EventTarget,
   domEventName: DOMEventName,
   eventSystemFlags: EventSystemFlags,
 ): Function {
+  /** 🚀 获取事件优先级 */
   const eventPriority = getEventPriority(domEventName);
   let listenerWrapper;
   switch (eventPriority) {
@@ -362,7 +364,9 @@ export function findInstanceBlockingEvent(
 
   return_targetInst = null;
 
+  /** 🚀 获取触发dom */
   const nativeEventTarget = getEventTarget(nativeEvent);
+  /** 🚀 获取与原生DOM对应的fiber节点 */
   let targetInst = getClosestInstanceFromNode(nativeEventTarget);
 
   if (targetInst !== null) {

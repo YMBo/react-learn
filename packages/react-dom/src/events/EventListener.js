@@ -7,6 +7,8 @@
  * @flow
  */
 
+
+/** 🚀 添加事件 冒泡 */
 export function addEventBubbleListener(
   target: EventTarget,
   eventType: string,
@@ -16,6 +18,7 @@ export function addEventBubbleListener(
   return listener;
 }
 
+/** 🚀 添加事件 捕获*/
 export function addEventCaptureListener(
   target: EventTarget,
   eventType: string,
@@ -25,6 +28,7 @@ export function addEventCaptureListener(
   return listener;
 }
 
+/** 🚀 添加事件 捕获且passive:true */
 export function addEventCaptureListenerWithPassiveFlag(
   target: EventTarget,
   eventType: string,
@@ -38,6 +42,7 @@ export function addEventCaptureListenerWithPassiveFlag(
   return listener;
 }
 
+/** 🚀 添加事件 冒泡且passive:true */
 export function addEventBubbleListenerWithPassiveFlag(
   target: EventTarget,
   eventType: string,
@@ -50,6 +55,7 @@ export function addEventBubbleListenerWithPassiveFlag(
   return listener;
 }
 
+/** 🚀 删除事件 */
 export function removeEventListener(
   target: EventTarget,
   eventType: string,

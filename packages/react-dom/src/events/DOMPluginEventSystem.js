@@ -86,6 +86,7 @@ type DispatchEntry = {|
 export type DispatchQueue = Array<DispatchEntry>;
 
 // TODO: remove top-level side effect.
+/** 🚀 注册事件 */
 SimpleEventPlugin.registerEvents();
 EnterLeaveEventPlugin.registerEvents();
 ChangeEventPlugin.registerEvents();
@@ -323,6 +324,12 @@ export function listenToNonDelegatedEvent(
   }
 }
 
+/**
+ * 🚀 绑定事件
+ * @param {*} domEventName 事件名称
+ * @param {*} isCapturePhaseListener 是否捕获
+ * @param {*} target 绑定的元素
+ */
 export function listenToNativeEvent(
   domEventName: DOMEventName,
   isCapturePhaseListener: boolean,
@@ -383,13 +390,22 @@ const listeningMarker =
     .toString(36)
     .slice(2);
 
+/**
+ * 🚀 给根元素绑定事件
+ * @param {*} rootContainerElement 根元素dom
+ */
 export function listenToAllSupportedEvents(rootContainerElement: EventTarget) {
   if (!(rootContainerElement: any)[listeningMarker]) {
     (rootContainerElement: any)[listeningMarker] = true;
+    /** 🚀 上面通过registerEvents() 往allNativeEvents注册了事件 */
     allNativeEvents.forEach(domEventName => {
       // We handle selectionchange separately because it
       // doesn't bubble and needs to be on the document.
+      // 🚀 当文本被选中时触发，不冒泡且只能绑定在document上，所以单独处理
       if (domEventName !== 'selectionchange') {
+        // 🚀 nonDelegatedEvents 存储着不会在DOM中冒泡的事件，如视频元素上的事件，scroll、load 事件等
+        // 🚀 这里将会冒泡到DOM上的事件绑定到根DOM容器上
+        // 🚀 listenToNativeEvent 的第二个参入传入 false ，表示在冒泡阶段监听事件
         if (!nonDelegatedEvents.has(domEventName)) {
           listenToNativeEvent(domEventName, false, rootContainerElement);
         }
@@ -411,6 +427,14 @@ export function listenToAllSupportedEvents(rootContainerElement: EventTarget) {
   }
 }
 
+/**
+ * 🚀
+ * @param {*} targetContainer 绑定的元素
+ * @param {*} domEventName 事件名称
+ * @param {*} eventSystemFlags
+ * @param {*} isCapturePhaseListener 是否捕获
+ * @param {*} isDeferredListenerForLegacyFBSupport
+ */
 function addTrappedEventListener(
   targetContainer: EventTarget,
   domEventName: DOMEventName,
@@ -418,6 +442,7 @@ function addTrappedEventListener(
   isCapturePhaseListener: boolean,
   isDeferredListenerForLegacyFBSupport?: boolean,
 ) {
+  /** 🚀 1、构建listener */
   let listener = createEventListenerWrapperWithPriority(
     targetContainer,
     domEventName,
@@ -426,6 +451,8 @@ function addTrappedEventListener(
   // If passive option is not supported, then the event will be
   // active and not passive.
   let isPassiveListener = undefined;
+
+  /** 🚀 2、如果浏览器支持passive,那么给下面这仨事件添加passive属性 */
   if (passiveBrowserEventsSupported) {
     // Browsers introduced an intervention, making these events
     // passive by default on document. React doesn't bind them
@@ -433,6 +460,7 @@ function addTrappedEventListener(
     // the performance wins from the change. So we emulate
     // the existing behavior manually on the roots now.
     // https://github.com/facebook/react/issues/19651
+    // 🚀 3、passive：true,浏览器目前只支持这几个事件的优化  `wheel, mousewheel, touchstart and touchmove`，因为mousewheel是非标准的所以用wheel代替
     if (
       domEventName === 'touchstart' ||
       domEventName === 'touchmove' ||
@@ -442,6 +470,7 @@ function addTrappedEventListener(
     }
   }
 
+  /** 🚀 3、获取目标dom */
   targetContainer =
     enableLegacyFBSupport && isDeferredListenerForLegacyFBSupport
       ? (targetContainer: any).ownerDocument
@@ -474,6 +503,7 @@ function addTrappedEventListener(
   // TODO: There are too many combinations here. Consolidate them.
   if (isCapturePhaseListener) {
     if (isPassiveListener !== undefined) {
+      /** 🚀 4、addEventListener第三个参数传 options上加passive:true */
       unsubscribeListener = addEventCaptureListenerWithPassiveFlag(
         targetContainer,
         domEventName,
@@ -481,6 +511,7 @@ function addTrappedEventListener(
         isPassiveListener,
       );
     } else {
+      /** 🚀 4、addEventListener第三个参数传false */
       unsubscribeListener = addEventCaptureListener(
         targetContainer,
         domEventName,
@@ -489,6 +520,7 @@ function addTrappedEventListener(
     }
   } else {
     if (isPassiveListener !== undefined) {
+      /** 🚀 同上 只不过是冒泡 */
       unsubscribeListener = addEventBubbleListenerWithPassiveFlag(
         targetContainer,
         domEventName,
@@ -496,6 +528,7 @@ function addTrappedEventListener(
         isPassiveListener,
       );
     } else {
+      /** 🚀 同上 只不过是冒泡 */
       unsubscribeListener = addEventBubbleListener(
         targetContainer,
         domEventName,

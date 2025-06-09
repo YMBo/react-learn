@@ -122,23 +122,34 @@ function FiberNode(
   mode: TypeOfMode,
 ) {
   // Instance
+  /** 🚀 组件的类型 */
   this.tag = tag;
+  /** 🚀 react元素的key */
   this.key = key;
+  /** 🚀 createElement的第一个参数，ReactElement上的type，就是节点的类型 div、p等*/
   this.elementType = null;
   this.type = null;
   this.stateNode = null;
 
   // Fiber
+  /** 🚀 父节点fiber */
   this.return = null;
+  /** 🚀 子节点fiber */
   this.child = null;
+  /** 🚀 兄弟节点fiber */
   this.sibling = null;
+  /** 🚀 兄弟节点的index */
   this.index = 0;
 
   this.ref = null;
 
+  /** 🚀 新的props */
   this.pendingProps = pendingProps;
+  /** 🚀 旧的props */
   this.memoizedProps = null;
+  /** 🚀 fiber上的更新队列 执行一次setState就会往这个属性上挂一个新的更新, 每条更新最终会形成一个链表结构，最后做批量更新 */
   this.updateQueue = null;
+  /** 🚀 对应memoizedProps，上次渲染的state，相当于当前的state，理解成prev和next的关系 */
   this.memoizedState = null;
   this.dependencies = null;
 

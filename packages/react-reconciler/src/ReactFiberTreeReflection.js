@@ -29,6 +29,7 @@ const ReactCurrentOwner = ReactSharedInternals.ReactCurrentOwner;
 export function getNearestMountedFiber(fiber: Fiber): null | Fiber {
   let node = fiber;
   let nearestMounted = fiber;
+  /** 🚀 如果alternate不存在，说明是第一次render，fiber树还没插入 */
   if (!fiber.alternate) {
     // If there is no alternate, this might be a new tree that isn't inserted
     // yet. If it is, then it will have a pending insertion effect on it.
@@ -48,6 +49,7 @@ export function getNearestMountedFiber(fiber: Fiber): null | Fiber {
       node = node.return;
     }
   }
+  /** 🚀 第一次的tag等于HostRoot */
   if (node.tag === HostRoot) {
     // TODO: Check if this was a nested HostRoot when used with
     // renderContainerIntoSubtree.
@@ -120,10 +122,13 @@ function assertIsMounted(fiber) {
 }
 
 export function findCurrentFiberUsingSlowPath(fiber: Fiber): Fiber | null {
+  /** 🚀 第一次render alternate是null */
   const alternate = fiber.alternate;
   if (!alternate) {
     // If there is no alternate, then we only need to check if it is mounted.
+     /** 🚀 这里nearestMounted=fiber */
     const nearestMounted = getNearestMountedFiber(fiber);
+   
 
     if (nearestMounted === null) {
       throw new Error('Unable to find node on an unmounted component.');
@@ -265,6 +270,7 @@ export function findCurrentFiberUsingSlowPath(fiber: Fiber): Fiber | null {
 }
 
 export function findCurrentHostFiber(parent: Fiber): Fiber | null {
+  // 🚀 找到当前父节点
   const currentParent = findCurrentFiberUsingSlowPath(parent);
   return currentParent !== null
     ? findCurrentHostFiberImpl(currentParent)
@@ -290,6 +296,7 @@ function findCurrentHostFiberImpl(node: Fiber) {
 }
 
 export function findCurrentHostFiberWithNoPortals(parent: Fiber): Fiber | null {
+  /** 🚀 这里parent=currentParent */
   const currentParent = findCurrentFiberUsingSlowPath(parent);
   return currentParent !== null
     ? findCurrentHostFiberWithNoPortalsImpl(currentParent)

@@ -207,6 +207,14 @@ function FiberNode(
 //    is faster.
 // 5) It should be easy to port this to a C struct and keep a C implementation
 //    compatible.
+/**
+ * 
+ * @param {*} tag 
+ * @param {*} pendingProps 
+ * @param {*} key 
+ * @param {*} mode 
+ * @returns 
+ */
 const createFiber = function(
   tag: WorkTag,
   pendingProps: mixed,
@@ -425,15 +433,28 @@ export function resetWorkInProgress(workInProgress: Fiber, renderLanes: Lanes) {
   return workInProgress;
 }
 
+/**
+ * 🚀
+ * 创建rootFiber根节点，一个应用可能有多个
+ * fiberRootNode的current指向当前页面渲染的rootFiber
+ * @param {*} tag 节点类型
+ * @param {*} isStrictMode 是否是严格模式
+ * @param {*} concurrentUpdatesByDefaultOverride 默认并发模式
+ * @returns 
+ */
 export function createHostRootFiber(
   tag: RootTag,
   isStrictMode: boolean,
   concurrentUpdatesByDefaultOverride: null | boolean,
 ): Fiber {
   let mode;
+  // 🚀 如果节点类型时1（根节点）
   if (tag === ConcurrentRoot) {
+    // 🚀 模式设置为并发模式
     mode = ConcurrentMode;
+    // 🚀 如果是严格模式开启
     if (isStrictMode === true) {
+      // mode 附加 StrictLegacyMode模式
       mode |= StrictLegacyMode;
 
       if (enableStrictEffects) {

@@ -511,10 +511,10 @@ export function claimNextRetryLane(): Lane {
   return lane;
 }
 
+/** 🚀 分离出优先级最高的lanes */
 export function getHighestPriorityLane(lanes: Lanes): Lane {
   return lanes & -lanes;
 }
-
 export function pickArbitraryLane(lanes: Lanes): Lane {
   // This wrapper function gets inlined. Only exists so to communicate that it
   // doesn't matter which bit is selected; you can pick any bit without
@@ -523,6 +523,12 @@ export function pickArbitraryLane(lanes: Lanes): Lane {
   return getHighestPriorityLane(lanes);
 }
 
+/**
+ * 🚀 得到lanes最左边的index，就是最小值1的index
+ * 例：0b00101 ,得到 2
+ * @param {*} lanes
+ * @returns number
+ */
 function pickArbitraryLaneIndex(lanes: Lanes) {
   return 31 - clz32(lanes);
 }
@@ -531,22 +537,52 @@ function laneToIndex(lane: Lane) {
   return pickArbitraryLaneIndex(lane);
 }
 
+/**
+ * 🚀 a，b是否有交集
+ * @param {*} a
+ * @param {*} b
+ * @returns boolean
+ */
 export function includesSomeLane(a: Lanes | Lane, b: Lanes | Lane) {
   return (a & b) !== NoLanes;
 }
 
+/**
+ * 🚀 subset是否为set的子集
+ * @param {*} set
+ * @param {*} subset
+ * @returns
+ */
 export function isSubsetOfLanes(set: Lanes, subset: Lanes | Lane) {
   return (set & subset) === subset;
 }
 
+/**
+ * 🚀 a,b 合并
+ * @param {Lanes} a
+ * @param {Lanes} b
+ * @returns
+ */
 export function mergeLanes(a: Lanes | Lane, b: Lanes | Lane): Lanes {
   return a | b;
 }
 
+/**
+ * 🚀 从set里删除subset
+ * @param {*} set
+ * @param {*} subset
+ * @returns
+ */
 export function removeLanes(set: Lanes, subset: Lanes | Lane): Lanes {
   return set & ~subset;
 }
 
+/**
+ * 🚀 取交集
+ * @param {*} a
+ * @param {*} b
+ * @returns
+ */
 export function intersectLanes(a: Lanes | Lane, b: Lanes | Lane): Lanes {
   return a & b;
 }
@@ -557,6 +593,12 @@ export function laneToLanes(lane: Lane): Lanes {
   return lane;
 }
 
+/**
+ * 🚀 取a，b优先级最高的
+ * @param {*} a
+ * @param {*} b
+ * @returns
+ */
 export function higherPriorityLane(a: Lane, b: Lane) {
   // This works because the bit ranges decrease in priority as you go left.
   return a !== NoLane && a < b ? a : b;

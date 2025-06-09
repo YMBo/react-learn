@@ -145,9 +145,11 @@ function defineRefPropWarningGetter(props, displayName) {
  * indicating filename, line number, and/or other information.
  * @internal
  */
+// 🚀 使用函数的方式创建React元素，instanceof失效，所以用$$typeof来代替
 const ReactElement = function(type, key, ref, self, source, owner, props) {
   const element = {
     // This tag allows us to uniquely identify this as a React Element
+    // 🚀 react元素的唯一标识
     $$typeof: REACT_ELEMENT_TYPE,
 
     // Built-in properties that belong on the element
@@ -203,9 +205,9 @@ const ReactElement = function(type, key, ref, self, source, owner, props) {
 
 /**
  * https://github.com/reactjs/rfcs/pull/107
- * @param {*} type
- * @param {object} props
- * @param {string} key
+ * @param {*} type 组件实例 function 或 class
+ * @param {object} config 除了key的props
+ * @param {string} key key
  */
 export function jsx(type, config, maybeKey) {
   let propName;
@@ -222,13 +224,16 @@ export function jsx(type, config, maybeKey) {
   // but as an intermediary step, we will use jsxDEV for everything except
   // <div {...props} key="Hi" />, because we aren't currently able to tell if
   // key is explicitly declared to be undefined or not.
+  // 🚀 如果key存在
   if (maybeKey !== undefined) {
     if (__DEV__) {
       checkKeyStringCoercion(maybeKey);
     }
+    // 🚀 将key转为字符串
     key = '' + maybeKey;
   }
 
+  // 🚀 如果props里存在key且有效
   if (hasValidKey(config)) {
     if (__DEV__) {
       checkKeyStringCoercion(config.key);
@@ -236,13 +241,16 @@ export function jsx(type, config, maybeKey) {
     key = '' + config.key;
   }
 
+  // 🚀 ref是否有效
   if (hasValidRef(config)) {
     ref = config.ref;
   }
 
   // Remaining properties are added to a new props object
+  // 🚀 过滤props，将除了ref，__self，__source，key以外的属性填充到props对象
   for (propName in config) {
     if (
+      // 🚀 判断是否是config上而不是原型上的属
       hasOwnProperty.call(config, propName) &&
       !RESERVED_PROPS.hasOwnProperty(propName)
     ) {
@@ -250,6 +258,7 @@ export function jsx(type, config, maybeKey) {
     }
   }
 
+  // 如果组件上挂了defaultProps默认props则填充到props上
   // Resolve default props
   if (type && type.defaultProps) {
     const defaultProps = type.defaultProps;
@@ -300,6 +309,7 @@ export function jsxDEV(type, config, maybeKey, source, self) {
       key = '' + maybeKey;
     }
 
+    // 🚀 是否为有效的key
     if (hasValidKey(config)) {
       if (__DEV__) {
         checkKeyStringCoercion(config.key);
